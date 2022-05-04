@@ -38,11 +38,6 @@ class Window(QWidget):
             self, itemDoubleClicked=self.onItemDoubleClicked, maximumHeight=200)
         layout.addWidget(self.windowList)
 
-    def closeEvent(self, event):
-        """Cửa sổ đóng"""
-        if self.layout().count() == 4:
-            self.restore()
-        super(Window, self).closeEvent(event)
 
     def _getWindowList(self):
         """Xóa danh sách ban đầu"""
@@ -63,7 +58,7 @@ class Window(QWidget):
         print('save', hwnd, style, exstyle)
 
         widget = QWidget.createWindowContainer(QWindow.fromWinId(hwnd))
-        widget.setFixedHeight(800)
+        widget.setFixedHeight(400)
         widget.hwnd = hwnd  # id
         widget.phwnd = phwnd  # tay cầm cửa sổ cha
         widget.style = style  # kiểu cửa sổ
@@ -73,22 +68,7 @@ class Window(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(widget)
         self.layout().addLayout(layout)
-    def restore(self):
-        """Cửa sổ trả lại"""
-        # Có một lỗi, sau khi quay lại, cửa sổ không có kiểu WS_VISIBLE và ẩn
-        widget = self.layout().itemAt(3).widget()
-        print('restore', widget.hwnd, widget.style, widget.exstyle)
-        # làm cho nó trở về cửa sổ mẹ của nó
-        win32gui.SetParent(widget.hwnd, widget.phwnd)
-        win32gui.SetWindowLong(
-            widget.hwnd, win32con.GWL_STYLE, widget.style | win32con.WS_VISIBLE)  # khôi phục kiểu
-        win32gui.SetWindowLong(
-            widget.hwnd, win32con.GWL_EXSTYLE, widget.exstyle)  # khôi phục kiểu
-        win32gui.ShowWindow(
-            widget.hwnd, win32con.SW_SHOW)  # cửa sổ hiển thị
-        widget.close()
-        self.layout().removeWidget(widget)  # xóa khỏi bố cục
-        widget.deleteLater()
+
 
     def _enumWindows(self, hwnd, _):
         """Hàm gọi lại theo chiều ngang"""
